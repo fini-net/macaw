@@ -23,21 +23,25 @@ The project uses a normalized SQLite database (3NF) with intentional denormaliza
 ### Core Database Tables
 
 **Customer & Contact Management:**
+
 - `customers` - Customer accounts linked to Authelia usernames
 - `contacts` - Reusable contact information (registrant, admin, tech, billing)
 - `domain_contacts` - Junction table linking domains to contact roles
 
 **Domain Management:**
+
 - `domains` - Core domain registration data with status lifecycle
 - `nameservers` - DNS nameserver configuration
 - `tld_data` - Flexible key-value store for registry-specific requirements (e.g., .ca registrant type, .us nexus category)
 
 **Billing:**
+
 - `invoices` - Customer invoices with denormalized totals
 - `billing_items` - Line items for domain services (registration, renewal, transfer, privacy)
 - `payments` - Payment transactions with optional invoice linkage
 
 **Audit:**
+
 - `audit_log` - Complete change tracking with JSON snapshots of old/new values
 
 ### Key Design Decisions
@@ -70,6 +74,7 @@ sqlite3 macaw.db "PRAGMA foreign_keys;"
 ## Planned Technology Stack
 
 ### Backend (Not Yet Implemented)
+
 - **Language**: Rust
 - **ORM**: sea-orm for type-safe database operations
 - **Database**: SQLite with foreign key constraints enabled
@@ -94,6 +99,7 @@ sea-orm-cli migrate up
 ```
 
 Key sea-orm considerations from `docs/database-schema.md`:
+
 - Map SQLite BOOLEAN (INTEGER) to Rust `bool` types
 - Use `DeriveActiveEnum` for status/type enums with CHECK constraints
 - Implement audit logging in application layer for all INSERT/UPDATE/DELETE operations
@@ -156,6 +162,7 @@ Validation is enforced via CUE schema in `docs/repo-toml.cue` and verified with 
 ## OpenSRS Integration (Future Implementation)
 
 The system will cache OpenSRS domain data locally to:
+
 - Reduce API calls and improve response times
 - Support offline reporting and analytics
 - Maintain audit trails of all domain changes
@@ -192,6 +199,7 @@ Run markdown linting locally: `markdownlint-cli2 **/*.md`
 ## Markdown Linting
 
 Configuration in `.markdownlint.yml`:
+
 - MD013 (line length) is disabled
 - MD041 (first line h1) is disabled
 - MD042 (no empty links) is disabled

@@ -16,6 +16,11 @@ domain registration backend
 - write server in Rust with sea-orm
 - maintain audit journal of all domain changes
 - handle billing
+- contact information updates
+- clean interface, no ads
+
+Eventually I'd like to implement most of
+[these features](https://github.com/fini-net/macaw/pull/3#issuecomment-3753022343).
 
 ## Contributing
 

@@ -1,0 +1,24 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:www.chicks.net)",
+      "WebFetch(domain:developers.facebook.com)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "WebFetch(domain:en.wikipedia.org)",
+      "WebSearch",
+      "Bash(markdownlint-cli2:*)",
+      "Bash(gh pr view:*)",
+      "Bash(gh pr diff:*)",
+      "Bash(git log:*)",
+      "Bash(identify:*)",
+      "Bash(just shellcheck:*)",
+      "Bash(just claude_review:*)",
+      "Bash(cue export:*)",
+      "WebFetch(domain:docs.github.com)",
+      "Bash(just cue-verify:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

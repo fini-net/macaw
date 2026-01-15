@@ -7,6 +7,8 @@
 
 domain registration backend
 
+![macaws take over the data center](docs/macaws-take-over-data-center.jpg)
+
 ## Initial Requirements
 
 - works with OpenSRS API

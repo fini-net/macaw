@@ -130,19 +130,6 @@ erDiagram
         TEXT notes
         DATETIME created_at
     }
-
-    audit_log {
-        INTEGER audit_id PK
-        TEXT table_name
-        INTEGER record_id
-        TEXT action "INSERT, UPDATE, DELETE"
-        TEXT changed_by "Authelia username"
-        TEXT old_values "JSON"
-        TEXT new_values "JSON"
-        TEXT ip_address
-        TEXT user_agent
-        DATETIME timestamp
-    }
 ```
 
 ## Relationship Details

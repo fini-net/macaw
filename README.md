@@ -5,7 +5,22 @@
 ![GitHub License](https://img.shields.io/github/license/fini-net/macaw)
 ![GitHub watchers](https://img.shields.io/github/watchers/fini-net/macaw)
 
-A good starting place for something. (TODO)
+domain registration backend
+
+## Initial Requirements
+
+- works with OpenSRS API
+- cache in a database
+- handle multiple customers
+- compatible with Authelia
+- write server in Rust with sea-orm
+- maintain audit journal of all domain changes
+- handle billing
+- contact information updates
+- clean interface, no ads
+
+Eventually I'd like to implement most of
+[these features](https://github.com/fini-net/macaw/pull/3#issuecomment-3753022343).
 
 ## Contributing
 

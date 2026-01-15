@@ -7,8 +7,6 @@
 *.dll
 *.so
 *.dylib
-hugo.linux
-hugo.darwin
 
 # Test binary, built with `go test -c`
 *.test
@@ -32,14 +30,10 @@ go.work.sum
 # vim swap files
 *.sw[a-p]
 
-# hugo debris
-.hugo_build.lock
-
 # repo-level cache for justfiles, etc.
 /.cache
 
-# our hugo run artifact
-/public.prev
 
-# tasks for this repo are in github actions
-/TODO.md
+# Added by cargo
+
+/target

@@ -35,11 +35,13 @@ CREATE TABLE customers (
 ```
 
 **Indexes:**
+
 - `idx_customers_username` on `username`
 - `idx_customers_email` on `email`
 - `idx_customers_status` on `status`
 
 **Key Fields:**
+
 - `username`: Links to Authelia authentication system
 - `account_balance`: Cached customer account balance
 - `credit_limit`: Maximum credit allowed
@@ -73,11 +75,13 @@ CREATE TABLE contacts (
 ```
 
 **Indexes:**
+
 - `idx_contacts_customer` on `customer_id`
 - `idx_contacts_email` on `email`
 - `idx_contacts_type` on `contact_type`
 
 **Key Fields:**
+
 - `contact_type`: Categorizes contact (registrant, admin, tech, billing)
 - `country_code`: ISO 3166-1 alpha-2 country code
 - Supports both individual and organization contacts
@@ -110,6 +114,7 @@ CREATE TABLE domains (
 ```
 
 **Indexes:**
+
 - `idx_domains_customer` on `customer_id`
 - `idx_domains_name` on `domain_name` (unique)
 - `idx_domains_tld` on `tld`
@@ -117,6 +122,7 @@ CREATE TABLE domains (
 - `idx_domains_expiration` on `expiration_date`
 
 **Key Fields:**
+
 - `domain_name`: Fully qualified domain name (FQDN)
 - `tld`: Top-level domain extracted for queries
 - `status`: Domain lifecycle state
@@ -126,6 +132,7 @@ CREATE TABLE domains (
 - `registry_domain_id`: OpenSRS/registry identifier
 
 **Domain Status Values:**
+
 - `pending`: Registration in progress
 - `active`: Domain is active and in good standing
 - `expired`: Domain has passed expiration date
@@ -151,10 +158,12 @@ CREATE TABLE domain_contacts (
 ```
 
 **Indexes:**
+
 - `idx_domain_contacts_domain` on `domain_id`
 - `idx_domain_contacts_contact` on `contact_id`
 
 **Key Fields:**
+
 - Composite primary key ensures each role is filled exactly once per domain
 - `contact_role`: registrant, admin, tech, or billing
 - Same contact can fill multiple roles for one domain
@@ -177,9 +186,11 @@ CREATE TABLE nameservers (
 ```
 
 **Indexes:**
+
 - `idx_nameservers_domain` on `domain_id`
 
 **Key Fields:**
+
 - `hostname`: Nameserver FQDN
 - `ip_address`: Optional glue record (required for in-bailiwick nameservers)
 - `priority`: Order/priority of nameservers
@@ -201,15 +212,18 @@ CREATE TABLE tld_data (
 ```
 
 **Indexes:**
+
 - `idx_tld_data_domain` on `domain_id`
 - `idx_tld_data_key` on `data_key`
 
 **Purpose:**
+
 - Flexible storage for TLD-specific requirements (e.g., .ca registrant type, .us nexus category)
 - Avoids adding TLD-specific columns to domains table
 - Supports future TLDs without schema changes
 
 **Example Data:**
+
 ```sql
 -- For .ca domain
 INSERT INTO tld_data (domain_id, data_key, data_value) VALUES
@@ -243,12 +257,14 @@ CREATE TABLE invoices (
 ```
 
 **Indexes:**
+
 - `idx_invoices_customer` on `customer_id`
 - `idx_invoices_number` on `invoice_number` (unique)
 - `idx_invoices_status` on `status`
 - `idx_invoices_due_date` on `due_date`
 
 **Key Fields:**
+
 - `invoice_number`: Human-readable unique identifier
 - `total_amount`: Cached sum of billing_items (denormalized)
 - `paid_amount`: Cached sum of payments (denormalized)
@@ -275,10 +291,12 @@ CREATE TABLE billing_items (
 ```
 
 **Indexes:**
+
 - `idx_billing_items_invoice` on `invoice_id`
 - `idx_billing_items_domain` on `domain_id`
 
 **Key Fields:**
+
 - `item_type`: Category of charge
 - `domain_id`: Optional link to specific domain
 - `total_price`: quantity × unit_price
@@ -305,12 +323,14 @@ CREATE TABLE payments (
 ```
 
 **Indexes:**
+
 - `idx_payments_customer` on `customer_id`
 - `idx_payments_invoice` on `invoice_id`
 - `idx_payments_transaction` on `transaction_id`
 - `idx_payments_status` on `status`
 
 **Key Fields:**
+
 - `payment_method`: How payment was made
 - `transaction_id`: External payment processor reference
 - `invoice_id`: Optional link (allows account credits)
@@ -336,11 +356,13 @@ CREATE TABLE audit_log (
 ```
 
 **Indexes:**
+
 - `idx_audit_table_record` on `(table_name, record_id)`
 - `idx_audit_changed_by` on `changed_by`
 - `idx_audit_timestamp` on `timestamp`
 
 **Key Fields:**
+
 - `table_name` + `record_id`: Identifies affected record
 - `action`: Type of change (INSERT, UPDATE, DELETE)
 - `changed_by`: Authelia username who made the change
@@ -352,6 +374,7 @@ CREATE TABLE audit_log (
 ### First Normal Form (1NF)
 
 ✅ **Satisfied**: All tables have:
+
 - Atomic columns (no repeating groups or arrays)
 - Primary keys defined
 - No duplicate rows possible
@@ -617,6 +640,7 @@ All foreign keys are indexed, plus additional indexes on:
 ### Caching Considerations
 
 Consider caching:
+
 - Customer account balances (already denormalized)
 - Active domain counts per customer
 - Invoice totals (already denormalized)
@@ -683,17 +707,20 @@ audit.insert(db).await?;
 ### Initial Setup
 
 1. Create SQLite database:
+
    ```bash
    sqlite3 macaw.db < docs/schema.sql
    ```
 
 2. Enable foreign keys in application:
+
    ```rust
    let db = Database::connect("sqlite://macaw.db?mode=rwc").await?;
    db.execute_unprepared("PRAGMA foreign_keys = ON;").await?;
    ```
 
 3. Generate entities:
+
    ```bash
    sea-orm-cli generate entity --database-url sqlite://macaw.db --output-dir src/entities
    ```
@@ -725,6 +752,7 @@ impl MigrationTrait for Migration {
 ```
 
 Run migrations:
+
 ```bash
 sea-orm-cli migrate up
 ```

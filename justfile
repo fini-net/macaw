@@ -3,6 +3,7 @@
 import? '.just/shellcheck.just'
 import? '.just/compliance.just'
 import? '.just/gh-process.just'
+import? '.just/cue-verify.just'
 
 # just list (default)
 list_recipes:

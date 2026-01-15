@@ -22,7 +22,7 @@ erDiagram
 
     customers {
         INTEGER customer_id PK
-        TEXT username UK "Authelia username"
+        TEXT username "Unique - Authelia username"
         TEXT email
         TEXT company_name
         DECIMAL account_balance
@@ -55,7 +55,7 @@ erDiagram
     domains {
         INTEGER domain_id PK
         INTEGER customer_id FK
-        TEXT domain_name UK
+        TEXT domain_name "Unique"
         TEXT tld
         TEXT status "pending, active, expired, etc."
         DATETIME registration_date
@@ -70,7 +70,7 @@ erDiagram
     }
 
     domain_contacts {
-        INTEGER domain_id PK_FK
+        INTEGER domain_id PK "FK to domains"
         INTEGER contact_id FK
         TEXT contact_role PK "registrant, admin, tech, billing"
     }
@@ -96,7 +96,7 @@ erDiagram
     invoices {
         INTEGER invoice_id PK
         INTEGER customer_id FK
-        TEXT invoice_number UK
+        TEXT invoice_number "Unique"
         DATETIME invoice_date
         DATETIME due_date
         DECIMAL total_amount

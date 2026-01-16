@@ -106,6 +106,58 @@ Key sea-orm considerations from `docs/database-schema.md`:
 - Always use parameterized queries (sea-orm does this automatically)
 - Encrypt `domains.auth_code` at rest (transfer authorization codes are sensitive)
 
+## Credential Management
+
+### OpenSRS API Credentials
+
+Macaw retrieves OpenSRS API credentials from 1Password using [fnox](https://github.com/jdx/fnox), a multi-provider secret manager.
+
+**1Password Setup:**
+
+- **Item Name:** "fini-opensrs"
+- **Vault:** "Private"
+- **Fields Required:**
+  - `username` - OpenSRS API username
+  - `credential` - OpenSRS API credential (note: not "password"!)
+
+**Developer Workflow:**
+
+```bash
+# One-time per terminal session
+just op_signin
+
+# Verify credentials are accessible
+just fnox_test
+
+# Run application with credentials
+just run_with_creds
+
+# Run tests with credentials
+just test_with_creds
+```
+
+**How It Works:**
+
+1. `fnox.toml` defines secret references (safe to commit)
+2. `just` recipes use `fnox get` to retrieve secrets into environment
+3. Rust code reads from `OPENSRS_USERNAME` and `OPENSRS_CREDENTIAL` env vars
+4. Configuration module validates and provides type-safe access
+
+**CI/CD Considerations:**
+
+For automated testing without 1Password access:
+
+- Set environment variables directly in CI
+- Use mock credentials for unit tests
+- Integration tests can be skipped if credentials unavailable
+
+**Security Notes:**
+
+- Credentials never stored in git (only references)
+- User session authentication (no service account tokens)
+- fnox.toml is safe to commit
+- Credentials only live in environment variables at runtime
+
 ## Development Workflow
 
 This repository uses `just` (command runner) for all development tasks. The workflow is entirely command-line based using `just` and the GitHub CLI (`gh`).

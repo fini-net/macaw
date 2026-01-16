@@ -9,6 +9,7 @@
       "WebFetch(domain:docs.github.com)",
       "WebFetch(domain:docs.rs)",
       "WebFetch(domain:fnox.jdx.dev)",
+      "WebFetch(domain:domains.opensrs.guide)",
       "WebSearch",
       "Bash(markdownlint-cli2:*)",
       "Bash(gh pr view:*)",

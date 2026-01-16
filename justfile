@@ -12,12 +12,12 @@ list_recipes:
 # run the code and see how it goes (default)
 [group('Rust')]
 try:
-  cargo run -- examples test_output
+  just with_secrets "cargo run"
 
 # run with backtrace enabled
 [group('Rust')]
 backtrace:
-  RUST_BACKTRACE=1 cargo run -- examples test_output
+  RUST_BACKTRACE=1 just with_secrets "cargo run"
 
 # what have you broken?
 [group('Rust')]
@@ -34,22 +34,38 @@ newdep crate_name:
   cargo add {{crate_name}}
   cargo doc
 
-# count posts per month
+# run cargo with OpenSRS credentials available
 [group('Rust')]
-count_posts output_dir='test_output':
+run_with_creds:
+  just with_secrets "cargo run"
+
+# run tests with OpenSRS credentials available
+[group('Rust')]
+test_with_creds:
+  just with_secrets "cargo test"
+
+# verify 1Password CLI is authenticated
+[group('Secrets')]
+op_status:
+  @op account list || echo "Not signed in. Run: just op_signin"
+
+# sign in to 1Password (interactive)
+[group('Secrets')]
+op_signin:
+  op signin
+
+# test fnox can retrieve OpenSRS credentials
+[group('Secrets')]
+fnox_test:
+  @echo "Testing fnox retrieval..."
+  @fnox get OPENSRS_USERNAME || echo "Failed to retrieve username"
+  @fnox get OPENSRS_CREDENTIAL || echo "Failed to retrieve credential"
+
+# export secrets to environment and run a command
+[group('Secrets')]
+with_secrets command:
   #!/usr/bin/env bash
   set -euo pipefail
-  if [ ! -d "{{output_dir}}" ]; then
-    echo "Directory {{output_dir}} does not exist"
-    exit 1
-  fi
-  echo "Post count by month in {{output_dir}}:"
-  echo "======================================"
-  find "{{output_dir}}" -maxdepth 1 -name "*.md" 2>/dev/null | \
-    sed 's|.*/||' | \
-    grep -E '^[0-9]{4}-[0-9]{2}-' | \
-    cut -d'-' -f1,2 | \
-    sort | \
-    uniq -c | \
-    awk '{printf "%s-%s: %2d posts\n", substr($2,1,4), substr($2,6,2), $1}' || \
-    echo "No markdown files found"
+  export OPENSRS_USERNAME=$(fnox get OPENSRS_USERNAME)
+  export OPENSRS_CREDENTIAL=$(fnox get OPENSRS_CREDENTIAL)
+  {{ command }}

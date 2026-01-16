@@ -24,6 +24,12 @@ go.work.sum
 # env file
 .env
 
+# 1Password session directory
+.op/
+
+# fnox local overrides
+fnox.local.toml
+
 # MacOS debris
 .DS_Store
 

@@ -66,6 +66,6 @@ fnox_test:
 with_secrets command:
   #!/usr/bin/env bash
   set -euo pipefail
-  export OPENSRS_USERNAME=$(fnox get OPENSRS_USERNAME)
-  export OPENSRS_CREDENTIAL=$(fnox get OPENSRS_CREDENTIAL)
+  export OPENSRS_USERNAME=$(fnox get OPENSRS_USERNAME | tail -1)
+  export OPENSRS_CREDENTIAL=$(fnox get OPENSRS_CREDENTIAL | tail -1)
   {{ command }}

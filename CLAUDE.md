@@ -8,7 +8,7 @@ Macaw is a domain registration backend that integrates with the OpenSRS API. It 
 
 ## Project Status
 
-This is currently a **planning and design phase** project. The database schema is complete, but the Rust application code has not been implemented yet.
+The database schema is complete. OpenSRS API integration (authentication and domain listing) has been implemented. Remaining work includes database caching, multi-customer support, and Authelia authentication integration.
 
 ## Database Architecture
 

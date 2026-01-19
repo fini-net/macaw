@@ -180,6 +180,8 @@ pub fn deserialize_response(xml: &str) -> Result<GetDomainsByExpireDateResponse>
                 let name = String::from_utf8_lossy(e.name().as_ref()).to_string();
                 if name == "data_block" {
                     in_data_block = false;
+                    in_attributes = false;
+                    in_exp_domains = false;
                 }
             }
             Ok(Event::Eof) => break,

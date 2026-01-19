@@ -98,8 +98,6 @@ pub fn deserialize_response(xml: &str) -> Result<GetDomainsByExpireDateResponse>
 
     // Simple state machine to track where we are in the XML
     let mut in_data_block = false;
-    #[allow(unused)]
-    let mut in_attributes = false;
     let mut in_exp_domains = false;
     let mut current_domain: Option<ExpiringDomain> = None;
     #[allow(unused)]
@@ -113,11 +111,9 @@ pub fn deserialize_response(xml: &str) -> Result<GetDomainsByExpireDateResponse>
                     in_data_block = true;
                 } else if name == "item" {
                     // Extract key attribute
-                    for attr in e.attributes() {
-                        if let Ok(attr) = attr {
-                            if attr.key.as_ref() == b"key" {
-                                current_key = String::from_utf8_lossy(&attr.value).to_string();
-                            }
+                    for attr in e.attributes().flatten() {
+                        if attr.key.as_ref() == b"key" {
+                            current_key = String::from_utf8_lossy(&attr.value).to_string();
                         }
                     }
                 }
@@ -171,7 +167,6 @@ pub fn deserialize_response(xml: &str) -> Result<GetDomainsByExpireDateResponse>
                             current_domain = None;
                         }
                     }
-                    "attributes" => in_attributes = true,
                     "exp_domains" => in_exp_domains = true,
                     _ => {}
                 }
@@ -180,7 +175,6 @@ pub fn deserialize_response(xml: &str) -> Result<GetDomainsByExpireDateResponse>
                 let name = String::from_utf8_lossy(e.name().as_ref()).to_string();
                 if name == "data_block" {
                     in_data_block = false;
-                    in_attributes = false;
                     in_exp_domains = false;
                 }
             }
@@ -210,8 +204,9 @@ pub fn deserialize_response(xml: &str) -> Result<GetDomainsByExpireDateResponse>
 }
 
 /// Calculate Content-Length (OpenSRS requires exact byte count)
+#[allow(dead_code)]
 pub fn calculate_content_length(xml: &str) -> usize {
-    xml.as_bytes().len()
+    xml.len()
 }
 
 #[cfg(test)]

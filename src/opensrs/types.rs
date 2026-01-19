@@ -30,25 +30,6 @@ pub struct ClientConfig {
     pub environment: Environment,
 }
 
-/// XCP protocol envelope structure
-#[derive(Debug, Serialize, Deserialize)]
-pub struct OpsEnvelope<T> {
-    pub header: OpsHeader,
-    pub body: OpsBody<T>,
-}
-
-/// XCP protocol header
-#[derive(Debug, Serialize, Deserialize)]
-pub struct OpsHeader {
-    pub version: String,
-}
-
-/// XCP protocol body
-#[derive(Debug, Serialize, Deserialize)]
-pub struct OpsBody<T> {
-    pub data_block: T,
-}
-
 /// Request to get domains by expiration date
 #[derive(Debug, Serialize)]
 pub struct GetDomainsByExpireDateRequest {
@@ -81,7 +62,9 @@ pub struct GetDomainsByExpireDateResponse {
 /// Response attributes for get_domains_by_expiredate
 #[derive(Debug, Deserialize)]
 pub struct GetDomainsByExpireDateResponseAttrs {
+    #[allow(dead_code)]
     pub page: u32,
+    #[allow(dead_code)]
     pub total: u32,
     /// 0 = all results returned, 1 = more pages available
     pub remainder: u8,

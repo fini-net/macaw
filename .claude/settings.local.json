@@ -24,7 +24,9 @@
       "Bash(just cue-verify:*)",
       "Bash(just list:*)",
       "Bash(just --list)",
-      "Bash(just check:*)"
+      "Bash(just check:*)",
+      "Bash(gh run list:*)",
+      "Bash(gh run view:*)"
     ],
     "deny": [],
     "ask": []

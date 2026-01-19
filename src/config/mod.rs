@@ -83,8 +83,10 @@ impl OpenSrsCredentials {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use serial_test::serial;
 
     #[test]
+    #[serial]
     fn test_missing_credentials() {
         unsafe {
             env::remove_var("OPENSRS_USERNAME");
@@ -96,6 +98,7 @@ mod tests {
     }
 
     #[test]
+    #[serial]
     fn test_available() {
         unsafe {
             env::remove_var("OPENSRS_USERNAME");

@@ -8,7 +8,7 @@ Macaw is a domain registration backend that integrates with the OpenSRS API. It 
 
 ## Project Status
 
-This is currently a **planning and design phase** project. The database schema is complete, but the Rust application code has not been implemented yet.
+The database schema is complete. OpenSRS API integration (authentication and domain listing) has been implemented. Remaining work includes database caching, multi-customer support, and Authelia authentication integration.
 
 ## Database Architecture
 
@@ -105,6 +105,58 @@ Key sea-orm considerations from `docs/database-schema.md`:
 - Implement audit logging in application layer for all INSERT/UPDATE/DELETE operations
 - Always use parameterized queries (sea-orm does this automatically)
 - Encrypt `domains.auth_code` at rest (transfer authorization codes are sensitive)
+
+## Credential Management
+
+### OpenSRS API Credentials
+
+Macaw retrieves OpenSRS API credentials from 1Password using [fnox](https://github.com/jdx/fnox), a multi-provider secret manager.
+
+**1Password Setup:**
+
+- **Item Name:** "fini-opensrs"
+- **Vault:** "Private"
+- **Fields Required:**
+  - `username` - OpenSRS API username
+  - `credential` - OpenSRS API credential (note: not "password"!)
+
+**Developer Workflow:**
+
+```bash
+# One-time per terminal session
+just op_signin
+
+# Verify credentials are accessible
+just fnox_test
+
+# Run application with credentials
+just run_with_creds
+
+# Run tests with credentials
+just test_with_creds
+```
+
+**How It Works:**
+
+1. `fnox.toml` defines secret references (safe to commit)
+2. `just` recipes use `fnox get` to retrieve secrets into environment
+3. Rust code reads from `OPENSRS_USERNAME` and `OPENSRS_CREDENTIAL` env vars
+4. Configuration module validates and provides type-safe access
+
+**CI/CD Considerations:**
+
+For automated testing without 1Password access:
+
+- Set environment variables directly in CI
+- Use mock credentials for unit tests
+- Integration tests can be skipped if credentials unavailable
+
+**Security Notes:**
+
+- Credentials never stored in git (only references)
+- User session authentication (no service account tokens)
+- fnox.toml is safe to commit
+- Credentials only live in environment variables at runtime
 
 ## Development Workflow
 

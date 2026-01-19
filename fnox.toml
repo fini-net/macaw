@@ -1,0 +1,10 @@
+# fnox configuration for Macaw - safe to commit (only references, no secrets)
+
+[providers.onepass]
+type = "1password"
+vault = "Private"
+
+[secrets]
+# OpenSRS API credentials from 1Password item "fini-opensrs"
+OPENSRS_USERNAME = { provider = "onepass", value = "fini-opensrs/username" }
+OPENSRS_CREDENTIAL = { provider = "onepass", value = "fini-opensrs/credential" }

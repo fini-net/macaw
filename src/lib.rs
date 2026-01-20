@@ -4,7 +4,10 @@
 //! SQLite caching, multi-customer support, and Authelia authentication.
 
 pub mod config;
+pub mod db;
+pub mod entities;
 pub mod opensrs;
+pub mod sync;
 
 // Re-export common types for convenience
 pub use config::{ConfigError, OpenSrsCredentials};

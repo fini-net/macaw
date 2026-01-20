@@ -1,6 +1,9 @@
 use super::client::OpenSrsClient;
 use super::error::{OpenSrsError, Result};
-use super::types::{ExpiringDomain, GetDomainsByExpireDateAttrs, GetDomainsByExpireDateRequest};
+use super::types::{
+    DomainAllInfo, ExpiringDomain, GetDomainAttrs, GetDomainRequest, GetDomainsByExpireDateAttrs,
+    GetDomainsByExpireDateRequest,
+};
 use chrono::NaiveDate;
 
 impl OpenSrsClient {
@@ -63,5 +66,45 @@ impl OpenSrsClient {
         }
 
         Ok(all_domains)
+    }
+
+    /// Get comprehensive information about a domain
+    ///
+    /// This method retrieves detailed information including contacts, nameservers,
+    /// and TLD-specific data for a domain.
+    ///
+    /// # Arguments
+    ///
+    /// * `domain` - The domain name to query (e.g., "example.com")
+    ///
+    /// # Returns
+    ///
+    /// Complete domain information including registration details, contacts, nameservers, etc.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the API request fails or returns an error response.
+    pub fn get_domain_all_info(&self, domain: &str) -> Result<DomainAllInfo> {
+        let request = GetDomainRequest {
+            protocol: "XCP".to_string(),
+            object: "DOMAIN".to_string(),
+            action: "GET".to_string(),
+            attributes: GetDomainAttrs {
+                domain: domain.to_string(),
+                req_type: "all_info".to_string(),
+            },
+        };
+
+        let response = self.send_get_domain_request(&request)?;
+
+        // Check for API errors
+        if !response.is_success {
+            return Err(OpenSrsError::ApiError {
+                code: response.response_code,
+                message: response.response_text,
+            });
+        }
+
+        Ok(response.attributes)
     }
 }

@@ -31,7 +31,8 @@
       "Bash(gh issue view:*)",
       "Bash(sea-orm-cli generate entity:*)",
       "Bash(cargo build:*)",
-      "Bash(cargo fmt:*)"
+      "Bash(cargo fmt:*)",
+      "Bash(cargo clippy:*)"
     ],
     "deny": [],
     "ask": []

@@ -1,27 +1,29 @@
 use crate::entities::audit_log;
 use sea_orm::{ActiveModelTrait, DatabaseConnection, DbErr, Set};
 
+/// Audit log entry data
+pub struct AuditEntry {
+    pub table_name: String,
+    pub record_id: i32,
+    pub action: String,
+    pub changed_by: String,
+    pub old_values: Option<String>,
+    pub new_values: Option<String>,
+    pub ip_address: Option<String>,
+    pub user_agent: Option<String>,
+}
+
 /// Log an audit entry
-pub async fn log_audit(
-    db: &DatabaseConnection,
-    table_name: &str,
-    record_id: i32,
-    action: &str,
-    changed_by: &str,
-    old_values: Option<String>,
-    new_values: Option<String>,
-    ip_address: Option<String>,
-    user_agent: Option<String>,
-) -> Result<(), DbErr> {
+pub async fn log_audit(db: &DatabaseConnection, entry: AuditEntry) -> Result<(), DbErr> {
     let audit_entry = audit_log::ActiveModel {
-        table_name: Set(table_name.to_string()),
-        record_id: Set(record_id),
-        action: Set(action.to_string()),
-        changed_by: Set(changed_by.to_string()),
-        old_values: Set(old_values),
-        new_values: Set(new_values),
-        ip_address: Set(ip_address),
-        user_agent: Set(user_agent),
+        table_name: Set(entry.table_name),
+        record_id: Set(entry.record_id),
+        action: Set(entry.action),
+        changed_by: Set(entry.changed_by),
+        old_values: Set(entry.old_values),
+        new_values: Set(entry.new_values),
+        ip_address: Set(entry.ip_address),
+        user_agent: Set(entry.user_agent),
         timestamp: Set(chrono::Utc::now().to_rfc3339()),
         ..Default::default()
     };
@@ -38,14 +40,16 @@ pub async fn log_domain_creation(
 ) -> Result<(), DbErr> {
     log_audit(
         db,
-        "domains",
-        domain_id,
-        "INSERT",
-        "sync_process",
-        None,
-        Some(format!("{{\"domain_name\":\"{}\"}}", domain_name)),
-        None,
-        None,
+        AuditEntry {
+            table_name: "domains".to_string(),
+            record_id: domain_id,
+            action: "INSERT".to_string(),
+            changed_by: "sync_process".to_string(),
+            old_values: None,
+            new_values: Some(format!("{{\"domain_name\":\"{}\"}}", domain_name)),
+            ip_address: None,
+            user_agent: None,
+        },
     )
     .await
 }
@@ -58,14 +62,16 @@ pub async fn log_contact_creation(
 ) -> Result<(), DbErr> {
     log_audit(
         db,
-        "contacts",
-        contact_id,
-        "INSERT",
-        "sync_process",
-        None,
-        Some(format!("{{\"email\":\"{}\"}}", email)),
-        None,
-        None,
+        AuditEntry {
+            table_name: "contacts".to_string(),
+            record_id: contact_id,
+            action: "INSERT".to_string(),
+            changed_by: "sync_process".to_string(),
+            old_values: None,
+            new_values: Some(format!("{{\"email\":\"{}\"}}", email)),
+            ip_address: None,
+            user_agent: None,
+        },
     )
     .await
 }
@@ -78,14 +84,16 @@ pub async fn log_customer_creation(
 ) -> Result<(), DbErr> {
     log_audit(
         db,
-        "customers",
-        customer_id,
-        "INSERT",
-        "sync_process",
-        None,
-        Some(format!("{{\"username\":\"{}\"}}", username)),
-        None,
-        None,
+        AuditEntry {
+            table_name: "customers".to_string(),
+            record_id: customer_id,
+            action: "INSERT".to_string(),
+            changed_by: "sync_process".to_string(),
+            old_values: None,
+            new_values: Some(format!("{{\"username\":\"{}\"}}", username)),
+            ip_address: None,
+            user_agent: None,
+        },
     )
     .await
 }

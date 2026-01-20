@@ -197,17 +197,19 @@ async fn sync_domain(
     // Create or update domain
     let domain = db::domains::create_or_update_domain(
         db,
-        customer_id,
-        domain_name,
-        &tld,
-        status,
-        &domain_info.registry_createdate,
-        &domain_info.domain_expdate,
-        auto_renew,
-        transfer_lock,
-        None, // auth_code - would need separate API call
-        whois_privacy,
-        Some(domain_info.registry_domainid.clone()),
+        db::domains::DomainData {
+            customer_id,
+            domain_name: domain_name.to_string(),
+            tld,
+            status: status.to_string(),
+            registration_date: domain_info.registry_createdate.clone(),
+            expiration_date: domain_info.domain_expdate.clone(),
+            auto_renew,
+            transfer_lock,
+            auth_code: None, // auth_code - would need separate API call
+            whois_privacy,
+            registry_domain_id: Some(domain_info.registry_domainid.clone()),
+        },
     )
     .await?;
 

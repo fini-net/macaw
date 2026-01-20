@@ -333,15 +333,14 @@ When implementing the backend:
 
 ## GitHub Actions Workflows
 
-Seven workflows run on PRs and pushes to main:
+Six workflows run on PRs and pushes to main:
 
 - `markdownlint` - Enforces markdown standards using `markdownlint-cli2`
 - `checkov` - Security scanning for GitHub Actions (continues on error, outputs SARIF)
 - `actionlint` - Lints GitHub Actions workflow files
 - `cue-verify` - Validates .repo.toml structure and flag configuration
-- `auto-assign` - Automatically assigns issues/PRs to `chicks-net`
-- `claude-code-review` - Claude AI review automation
-- `claude` - Additional Claude integration
+- `rust` - Rust build and test workflow
+- `verify` - Cross-platform testing with `just check`
 
 Run markdown linting locally: `markdownlint-cli2 **/*.md`
 

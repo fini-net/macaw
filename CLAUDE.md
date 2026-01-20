@@ -8,7 +8,19 @@ Macaw is a domain registration backend that integrates with the OpenSRS API. It 
 
 ## Project Status
 
-The database schema is complete. OpenSRS API integration (authentication and domain listing) has been implemented. Remaining work includes database caching, multi-customer support, and Authelia authentication integration.
+Complete:
+
+- Database schema design (SQLite)
+- OpenSRS API integration (authentication and domain listing)
+- Configuration management with environment variable loading
+- MD5-based signature authentication for OpenSRS
+- Custom XML serialization/deserialization for OpenSRS API
+
+Remaining:
+
+- Database caching layer (sea-orm integration)
+- Multi-customer support
+- Authelia authentication integration
 
 ## Database Architecture
 
@@ -71,15 +83,55 @@ sqlite3 macaw.db < docs/schema.sql
 sqlite3 macaw.db "PRAGMA foreign_keys;"
 ```
 
-## Planned Technology Stack
+## Rust Code Architecture
 
-### Backend (Not Yet Implemented)
+### Module Structure
 
-- **Language**: Rust
-- **ORM**: sea-orm for type-safe database operations
-- **Database**: SQLite with foreign key constraints enabled
-- **Authentication**: Authelia integration (external service)
-- **API Integration**: OpenSRS domain registration API
+The codebase is organized into two main modules:
+
+- `src/config/` - Configuration management
+  - `OpenSrsCredentials::from_env()` - Loads credentials from environment variables
+  - `OpenSrsCredentials::available()` - Checks if credentials are present without loading
+  - Validates that credentials are non-empty
+
+- `src/opensrs/` - OpenSRS API client implementation
+  - `auth.rs` - MD5 signature generation: `md5(md5(xml + key) + key)`
+  - `client.rs` - HTTP client with ureq, sends authenticated requests
+  - `domain.rs` - High-level domain operations (automatic pagination)
+  - `error.rs` - Error types using thiserror (ApiError, HttpError, XmlDeserialize, etc.)
+  - `types.rs` - Request/response types (Environment, ClientConfig, ExpiringDomain)
+  - `xml.rs` - Custom XML serialization for OpenSRS's non-standard `<dt_assoc>` format
+
+### OpenSRS XML Format
+
+OpenSRS uses a proprietary XML structure with `<dt_assoc>` and `<item key="...">` tags that cannot be handled by standard serde. Manual XML construction and parsing is used:
+
+- Serialization: String building for requests (see `xml::serialize_request`)
+- Deserialization: Event-based parsing with quick-xml (see `xml::deserialize_response`)
+
+### API Client Pattern
+
+The `OpenSrsClient` provides high-level methods that handle:
+
+1. XML serialization
+2. MD5 signature generation
+3. HTTP headers (X-Username, X-Signature)
+4. Response parsing
+5. Automatic pagination (see `get_domains_by_expiredate`)
+
+### Testing Strategy
+
+Tests use `serial_test` crate for environment variable isolation. Integration tests requiring credentials check `OpenSrsCredentials::available()` and skip if unavailable.
+
+## Technology Stack
+
+- **Language**: Rust 2024 edition
+- **HTTP Client**: ureq 3.0 (blocking, with native-tls)
+- **XML**: quick-xml 0.36 with manual serialization
+- **Hashing**: md-5 0.10 for OpenSRS signature
+- **Error Handling**: thiserror 2.0
+- **Date/Time**: chrono 0.4
+- **Database** (planned): sea-orm with SQLite
 
 ### sea-orm Integration (Future)
 
@@ -211,7 +263,52 @@ copilot-review = true
 
 Validation is enforced via CUE schema in `docs/repo-toml.cue` and verified with `just cue-verify`.
 
-## OpenSRS Integration (Future Implementation)
+## Development Commands
+
+### Quality Checks
+
+```bash
+just check         # Run all checks: fmt, clippy, test, audit
+cargo fmt --check  # Check code formatting
+cargo check        # Compile check without building
+cargo clippy       # Run linter
+cargo test         # Run all tests
+cargo audit        # Check for security vulnerabilities
+```
+
+### Running the Application
+
+```bash
+just try              # Run with credentials (default)
+just run_with_creds   # Run with OpenSRS credentials from 1Password
+just backtrace        # Run with RUST_BACKTRACE=1 for detailed errors
+```
+
+### Testing
+
+```bash
+just test_with_creds  # Run tests with OpenSRS credentials
+cargo test            # Run tests without credentials (some will skip)
+```
+
+### Environment Variables
+
+- `OPENSRS_USERNAME` - OpenSRS API username (loaded by fnox)
+- `OPENSRS_CREDENTIAL` - OpenSRS API credential (loaded by fnox)
+- `OPENSRS_ENVIRONMENT` - Set to "production" for production API (defaults to test)
+
+## OpenSRS Integration
+
+### Current Implementation
+
+The OpenSRS client (`src/opensrs/`) handles:
+
+- Authentication via MD5 signature (`X-Username` and `X-Signature` headers)
+- Environment selection (test/production endpoints)
+- Domain listing with automatic pagination
+- Custom XML format serialization/deserialization
+
+### Future Database Caching
 
 The system will cache OpenSRS domain data locally to:
 

@@ -36,7 +36,8 @@
       "Bash(cargo audit:*)",
       "WebFetch(domain:crates.io)",
       "Bash(cargo metadata:*)",
-      "Bash(cargo tree:*)"
+      "Bash(cargo tree:*)",
+      "Bash(gh release list:*)"
     ],
     "deny": [],
     "ask": []

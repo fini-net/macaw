@@ -69,3 +69,39 @@ with_secrets command:
   export OPENSRS_USERNAME=$(fnox get OPENSRS_USERNAME | tail -1)
   export OPENSRS_CREDENTIAL=$(fnox get OPENSRS_CREDENTIAL | tail -1)
   {{ command }}
+
+# preview what cargo-dist will build (dry run)
+[group('Release')]
+dist_plan:
+  ~/.cargo/bin/dist plan
+
+# build release artifacts locally (for testing)
+[group('Release')]
+dist_build:
+  ~/.cargo/bin/dist build
+
+# verify cargo-dist configuration
+[group('Release')]
+dist_check:
+  ~/.cargo/bin/dist init --yes
+
+# make a release with binaries (cargo-dist)
+[group('Process')]
+rust_release rel_version:
+    #!/usr/bin/env bash
+    set -euo pipefail
+
+    # Validate version format (vX.Y.Z)
+    if [[ ! "{{rel_version}}" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+        echo "Error: Version must be in format vX.Y.Z (e.g., v0.1.0)"
+        exit 1
+    fi
+
+    echo "Creating and pushing tag {{rel_version}}..."                                                                          git tag "{{rel_version}}"
+    git push origin "{{rel_version}}"
+
+    echo "Tag pushed. GitHub Actions will build binaries and create release."
+    echo "Watch progress: https://github.com/fini-net/macaw/actions"
+
+    sleep 5
+    git pull

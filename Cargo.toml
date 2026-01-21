@@ -2,6 +2,10 @@
 name = "macaw"
 version = "0.1.0"
 edition = "2024"
+repository = "https://github.com/fini-net/macaw"
+homepage = "https://github.com/fini-net/macaw"
+license = "GPL-2.0-only"
+description = "Domain registration backend integrating with OpenSRS API"
 
 [dependencies]
 thiserror = "2.0"
@@ -27,3 +31,8 @@ path = "src/lib.rs"
 [[bin]]
 name = "macaw"
 path = "src/main.rs"
+
+# The profile that 'dist' will build with
+[profile.dist]
+inherits = "release"
+lto = "thin"

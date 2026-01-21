@@ -24,6 +24,29 @@ domain registration backend
 Eventually I'd like to implement most of
 [these features](https://github.com/fini-net/macaw/pull/3#issuecomment-3753022343).
 
+## Installation
+
+### Using Shell Installer
+
+```bash
+curl --proto '=https' --tlsv1.2 -LsSf \
+  https://github.com/fini-net/macaw/releases/latest/download/macaw-installer.sh | sh
+```
+
+### Download Pre-built Binaries
+
+From [releases page](https://github.com/fini-net/macaw/releases):
+
+- macOS (Apple Silicon): `macaw-*-aarch64-apple-darwin.tar.gz`
+- macOS (Intel): `macaw-*-x86_64-apple-darwin.tar.gz`
+- Linux (GNU): `macaw-*-x86_64-unknown-linux-gnu.tar.gz`
+- Linux (musl): `macaw-*-x86_64-unknown-linux-musl.tar.gz`
+
+```bash
+tar xzf macaw-*.tar.gz
+mv macaw ~/.local/bin/
+```
+
 ## Quick Start
 
 ### Prerequisites

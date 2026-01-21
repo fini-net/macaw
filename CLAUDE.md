@@ -330,6 +330,7 @@ When implementing the backend:
    - Passwords handled by Authelia (external authentication)
 3. **Row-Level Security**: Always filter queries by `customer_id` to prevent unauthorized access
 4. **Audit Logging**: Populate `audit_log` for all domain/contact/billing changes with IP address and user agent
+5. **Cargo Audit Configuration**: The project uses `.cargo/audit.toml` to ignore RUSTSEC-2023-0071 (Marvin Attack in `rsa` crate). This is safe because the vulnerability is in MySQL TLS code that macaw never uses - macaw exclusively uses SQLite. The `rsa` crate is only a transitive dependency via `sqlx-mysql`. Review this ignore when upgrading sea-orm or sqlx.
 
 ## GitHub Actions Workflows
 

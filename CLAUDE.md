@@ -226,7 +226,7 @@ This repository uses `just` (command runner) for all development tasks. The work
 
 - `just` or `just list` - Show all available recipes
 - `just prweb` - Open current PR in browser
-- `just release <version>` - Create a GitHub release with auto-generated notes
+- `just release <version>` - Create a GitHub release with binaries (via cargo-dist)
 - `just compliance_check` - Run custom repo compliance checks
 - `just cue-verify` - Verify .repo.toml structure and flag configuration
 - `just shellcheck` - Run shellcheck on all bash scripts in just recipes
@@ -241,6 +241,38 @@ The main `justfile` imports five modules from `.just/`:
 - `.just/pr-hook.just` - Optional pre-PR hooks for project-specific automation
 - `.just/shellcheck.just` - Shellcheck linting for bash scripts in just recipes
 - `.just/cue-verify.just` - CUE validation for .repo.toml structure and flags
+
+### Release Process with cargo-dist
+
+#### Creating a Release
+
+1. Update version in Cargo.toml and rebuild to update Cargo.lock
+2. Commit: `git commit -am "Bump version to vX.Y.Z"`
+3. Create release: `just release vX.Y.Z`
+4. Monitor: <https://github.com/fini-net/macaw/actions>
+
+#### Release Artifacts
+
+Each release includes:
+
+- Binaries for 4 platforms (macOS aarch64/x86_64, Linux gnu/musl)
+- SHA256 checksums
+- Shell installer
+- Homebrew formula (if tap configured)
+
+#### Local Testing
+
+```bash
+just dist_plan  # Preview
+just dist_build # Build locally
+```
+
+#### Homebrew Installation
+
+```bash
+curl --proto '=https' --tlsv1.2 -LsSf \
+  https://github.com/fini-net/macaw/releases/latest/download/macaw-installer.sh | sh
+```
 
 ### Repository Configuration
 

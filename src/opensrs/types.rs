@@ -80,3 +80,113 @@ pub struct ExpiringDomain {
     pub f_auto_renew: String,
     pub f_let_expire: String,
 }
+
+/// Request to get domain information
+#[derive(Debug, Serialize)]
+pub struct GetDomainRequest {
+    pub protocol: String,
+    pub object: String,
+    pub action: String,
+    pub attributes: GetDomainAttrs,
+}
+
+/// Attributes for get_domain request
+#[derive(Debug, Serialize)]
+pub struct GetDomainAttrs {
+    pub domain: String,
+    #[serde(rename = "type")]
+    pub req_type: String,
+}
+
+/// Response from get_domain with all_info type
+#[derive(Debug, Deserialize)]
+pub struct GetDomainAllInfoResponse {
+    pub is_success: bool,
+    pub response_code: String,
+    pub response_text: String,
+    pub attributes: DomainAllInfo,
+}
+
+/// Comprehensive domain information
+#[derive(Debug, Deserialize, Clone)]
+pub struct DomainAllInfo {
+    pub domain_name: String,
+    #[serde(default)]
+    pub domain_expdate: String,
+    #[serde(default)]
+    pub registry_createdate: String,
+    #[serde(default)]
+    pub auto_renew: String,
+    #[serde(default)]
+    pub lock_state: String,
+    #[serde(default)]
+    pub whois_privacy_state: String,
+    #[serde(default)]
+    pub registry_domainid: String,
+    #[serde(default)]
+    pub contact_set: ContactSet,
+    #[serde(default)]
+    pub nameserver_list: Vec<NameserverInfo>,
+    #[serde(default)]
+    pub tld_data: TldDataMap,
+}
+
+/// Contact set with all four contact types
+#[derive(Debug, Deserialize, Clone, Default)]
+pub struct ContactSet {
+    #[serde(default)]
+    pub owner: Option<ContactInfo>,
+    #[serde(default)]
+    pub admin: Option<ContactInfo>,
+    #[serde(default)]
+    pub billing: Option<ContactInfo>,
+    #[serde(default)]
+    pub tech: Option<ContactInfo>,
+}
+
+/// Contact information from OpenSRS
+#[derive(Debug, Deserialize, Clone, Default)]
+pub struct ContactInfo {
+    #[serde(default)]
+    pub first_name: String,
+    #[serde(default)]
+    pub last_name: String,
+    #[serde(default)]
+    pub org_name: Option<String>,
+    #[serde(default)]
+    pub email: String,
+    #[serde(default)]
+    pub phone: String,
+    #[serde(default)]
+    pub fax: Option<String>,
+    #[serde(default)]
+    pub address1: String,
+    #[serde(default)]
+    pub address2: Option<String>,
+    #[serde(default)]
+    pub city: String,
+    #[serde(default)]
+    pub state: String,
+    #[serde(default)]
+    pub postal_code: String,
+    #[serde(default)]
+    pub country: String,
+}
+
+/// Nameserver information from OpenSRS
+#[derive(Debug, Deserialize, Clone, Default)]
+pub struct NameserverInfo {
+    #[serde(default)]
+    pub name: String,
+    #[serde(default)]
+    pub sortorder: i32,
+    #[serde(default)]
+    pub ipaddress: Option<String>,
+}
+
+/// TLD-specific data map (for .ca, .us, etc.)
+#[derive(Debug, Deserialize, Clone, Default)]
+pub struct TldDataMap {
+    #[serde(default, flatten)]
+    pub data: std::collections::HashMap<String, String>,
+}

@@ -43,3 +43,9 @@ fnox.local.toml
 # Added by cargo
 
 /target
+
+# Macaw-specific files
+domains.toml
+macaw.db
+macaw.db-shm
+macaw.db-wal

@@ -36,8 +36,8 @@ newdep crate_name:
 
 # run cargo with OpenSRS credentials available
 [group('Rust')]
-run_with_creds:
-  just with_secrets "cargo run"
+run_with_creds subcommand="sync":
+  just with_secrets "cargo run {{subcommand}}"
 
 # run tests with OpenSRS credentials available
 [group('Rust')]

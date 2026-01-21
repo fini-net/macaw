@@ -11,5 +11,10 @@ ci = "github"
 installers = ["shell", "homebrew"]
 # Target platforms to build apps for (Rust target-triple syntax)
 targets = ["aarch64-apple-darwin", "x86_64-apple-darwin", "x86_64-unknown-linux-gnu", "x86_64-unknown-linux-musl"]
+# Whether to publish prereleases to package managers
 # Don't publish prereleases (Homebrew best practice)
 publish-prereleases = false
+# Path that installers should place binaries in
+install-path = "CARGO_HOME"
+# Whether to install an updater program
+install-updater = false

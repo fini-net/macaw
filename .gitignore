@@ -39,9 +39,7 @@ fnox.local.toml
 # repo-level cache for justfiles, etc.
 /.cache
 
-
 # Added by cargo
-
 /target
 
 # Macaw-specific files
@@ -49,3 +47,6 @@ domains.toml
 macaw.db
 macaw.db-shm
 macaw.db-wal
+
+# Backup files (caused by src/entities/*.bak)
+*.bak

@@ -9,7 +9,7 @@ import? '.just/cue-verify.just'
 list_recipes:
   just --list
 
-# run the code and see how it goes (default)
+# run the code and see how it goes
 [group('Rust')]
 try:
   just with_secrets "cargo run"
@@ -86,7 +86,7 @@ dist_check:
   ~/.cargo/bin/dist init --yes
 
 # make a release with binaries (cargo-dist)
-[group('Process')]
+[group('Release')]
 rust_release rel_version:
     #!/usr/bin/env bash
     set -euo pipefail

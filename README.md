@@ -12,14 +12,14 @@ domain registration backend
 ## Initial Requirements
 
 - [x] works with OpenSRS API
-- [ ] cache in a database
-- [ ] handle multiple customers
-- [ ] compatible with Authelia
+- [x] clean interface, no ads
 - [x] write server in Rust with sea-orm
+- [x] cache in a database
+- [ ] contact information updates
+- [ ] compatible with Authelia
+- [ ] handle multiple customers
 - [ ] maintain audit journal of all domain changes
 - [ ] handle billing
-- [ ] contact information updates
-- [x] clean interface, no ads
 
 Eventually I'd like to implement most of
 [these features](https://github.com/fini-net/macaw/pull/3#issuecomment-3753022343).

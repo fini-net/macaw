@@ -23,5 +23,4 @@ jobs:
       - name: Check workflow files
         uses: docker://rhysd/actionlint:latest
         with:
-          args: -color -ignore-files "release\\.yml"
-# ignoring "release.yml" since cargo generates it and won't accept any improvements
+          args: -color

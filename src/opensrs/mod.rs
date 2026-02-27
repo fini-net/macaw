@@ -8,4 +8,7 @@ mod xml;
 // Public exports
 pub use client::OpenSrsClient;
 pub use error::{OpenSrsError, Result};
-pub use types::{ClientConfig, Environment, ExpiringDomain};
+pub use types::{
+    ClientConfig, ContactInfo, ContactInfoForUpdate, ContactSet, Environment, ExpiringDomain,
+    SetContactRequest, SetContactResponse, SetContactSet,
+};

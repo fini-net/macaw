@@ -14,8 +14,8 @@ CREATE TABLE customers (
     username TEXT NOT NULL UNIQUE,  -- Authelia username
     email TEXT NOT NULL,
     company_name TEXT,
-    account_balance DECIMAL(10,2) NOT NULL DEFAULT 0.00,
-    credit_limit DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+    account_balance REAL NOT NULL DEFAULT 0.00,
+    credit_limit REAL NOT NULL DEFAULT 0.00,
     status TEXT NOT NULL CHECK(status IN ('active', 'suspended', 'closed')) DEFAULT 'active',
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
@@ -156,8 +156,8 @@ CREATE TABLE invoices (
     invoice_number TEXT NOT NULL UNIQUE,
     invoice_date DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     due_date DATETIME NOT NULL,
-    total_amount DECIMAL(10,2) NOT NULL DEFAULT 0.00,
-    paid_amount DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+    total_amount REAL NOT NULL DEFAULT 0.00,
+    paid_amount REAL NOT NULL DEFAULT 0.00,
     status TEXT NOT NULL CHECK(status IN ('draft', 'issued', 'paid', 'overdue', 'cancelled')) DEFAULT 'draft',
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -177,8 +177,8 @@ CREATE TABLE billing_items (
     item_type TEXT NOT NULL CHECK(item_type IN ('registration', 'renewal', 'transfer', 'privacy', 'other')),
     description TEXT NOT NULL,
     quantity INTEGER NOT NULL DEFAULT 1,
-    unit_price DECIMAL(10,2) NOT NULL,
-    total_price DECIMAL(10,2) NOT NULL,
+    unit_price REAL NOT NULL,
+    total_price REAL NOT NULL,
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (invoice_id) REFERENCES invoices(invoice_id) ON DELETE CASCADE,
     FOREIGN KEY (domain_id) REFERENCES domains(domain_id) ON DELETE SET NULL
@@ -194,7 +194,7 @@ CREATE TABLE payments (
     invoice_id INTEGER,  -- Optional invoice link
     payment_method TEXT NOT NULL CHECK(payment_method IN ('credit_card', 'bank_transfer', 'paypal', 'credit', 'other')),
     transaction_id TEXT,  -- External payment processor ID
-    amount DECIMAL(10,2) NOT NULL,
+    amount REAL NOT NULL,
     payment_date DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     status TEXT NOT NULL CHECK(status IN ('pending', 'completed', 'failed', 'refunded')) DEFAULT 'pending',
     notes TEXT,

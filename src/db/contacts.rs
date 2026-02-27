@@ -136,10 +136,7 @@ pub enum UpdateStrategy {
 }
 
 /// Check if a contact is shared across multiple domains
-pub async fn is_contact_shared(
-    db: &DatabaseConnection,
-    contact_id: i32,
-) -> Result<bool, DbErr> {
+pub async fn is_contact_shared(db: &DatabaseConnection, contact_id: i32) -> Result<bool, DbErr> {
     let links = DomainContacts::find()
         .filter(domain_contacts::Column::ContactId.eq(contact_id))
         .all(db)
@@ -162,7 +159,7 @@ pub async fn get_contact_domains(
 }
 
 /// Update an existing contact
-/// 
+///
 /// Returns the contact ID that was updated. If the contact is shared and
 /// strategy is CreateNew, returns the new contact ID.
 pub async fn update_contact(

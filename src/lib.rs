@@ -12,7 +12,7 @@ pub mod sync;
 // Re-export common types for convenience
 pub use config::{ConfigError, OpenSrsCredentials};
 pub use opensrs::{
-    ClientConfig, ContactInfo as OpenSrsContactInfo, ContactInfoForUpdate, ContactSet,
-    Environment, ExpiringDomain, OpenSrsClient, OpenSrsError, SetContactRequest,
-    SetContactResponse, SetContactSet,
+    ClientConfig, ContactInfo as OpenSrsContactInfo, ContactInfoForUpdate, ContactSet, Environment,
+    ExpiringDomain, OpenSrsClient, OpenSrsError, SetContactRequest, SetContactResponse,
+    SetContactSet,
 };

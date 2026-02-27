@@ -108,12 +108,8 @@ pub async fn log_contact_update(
     ip_address: Option<&str>,
     user_agent: Option<&str>,
 ) -> Result<(), DbErr> {
-    let old_json = old_values.map(|c| {
-        serde_json::to_string(c).unwrap_or_default()
-    });
-    let new_json = new_values.map(|c| {
-        serde_json::to_string(c).unwrap_or_default()
-    });
+    let old_json = old_values.map(|c| serde_json::to_string(c).unwrap_or_default());
+    let new_json = new_values.map(|c| serde_json::to_string(c).unwrap_or_default());
 
     log_audit(
         db,

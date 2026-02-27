@@ -398,8 +398,10 @@ async fn main() {
             };
 
             if !response.is_success {
-                eprintln!("✗ OpenSRS returned error: {} - {}", 
-                    response.response_code, response.response_text);
+                eprintln!(
+                    "✗ OpenSRS returned error: {} - {}",
+                    response.response_code, response.response_text
+                );
                 std::process::exit(1);
             }
 
@@ -419,7 +421,9 @@ async fn main() {
                 &contact_info,
                 strategy,
                 Some(domain_id),
-            ).await {
+            )
+            .await
+            {
                 Ok(id) => id,
                 Err(e) => {
                     eprintln!("✗ Failed to update local contact: {}", e);
@@ -457,7 +461,9 @@ async fn main() {
                 "cli_user",
                 None,
                 None,
-            ).await {
+            )
+            .await
+            {
                 eprintln!("  ⚠ Failed to write audit log: {}", e);
             } else {
                 println!("  ✓ Audit log written");

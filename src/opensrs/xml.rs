@@ -79,8 +79,8 @@ pub fn serialize_request(request: &GetDomainsByExpireDateRequest) -> Result<Stri
 ///
 /// OpenSRS uses a dt_assoc/item structure that requires custom parsing.
 pub fn deserialize_response(xml: &str) -> Result<GetDomainsByExpireDateResponse> {
-    use quick_xml::events::Event;
     use quick_xml::Reader;
+    use quick_xml::events::Event;
 
     let mut reader = Reader::from_str(xml);
     reader.config_mut().trim_text(true);
@@ -661,8 +661,8 @@ pub fn serialize_set_contact_request(request: &SetContactRequest) -> Result<Stri
 /// This is a simplified parser that extracts common fields
 /// For a production system, you'd want more robust parsing
 pub fn deserialize_domain_all_info(xml: &str) -> Result<GetDomainAllInfoResponse> {
-    use quick_xml::events::Event;
     use quick_xml::Reader;
+    use quick_xml::events::Event;
     use std::collections::HashMap;
 
     let mut reader = Reader::from_str(xml);
@@ -832,8 +832,8 @@ pub fn deserialize_domain_all_info(xml: &str) -> Result<GetDomainAllInfoResponse
 
 /// Deserialize OpenSRS set_contact response
 pub fn deserialize_set_contact_response(xml: &str) -> Result<SetContactResponse> {
-    use quick_xml::events::Event;
     use quick_xml::Reader;
+    use quick_xml::events::Event;
 
     let mut reader = Reader::from_str(xml);
     reader.config_mut().trim_text(true);

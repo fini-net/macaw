@@ -97,3 +97,58 @@ pub async fn log_customer_creation(
     )
     .await
 }
+
+/// Log a contact update with old and new values as JSON
+pub async fn log_contact_update(
+    db: &DatabaseConnection,
+    contact_id: i32,
+    old_values: Option<&crate::db::contacts::ContactInfo>,
+    new_values: Option<&crate::db::contacts::ContactInfo>,
+    changed_by: &str,
+    ip_address: Option<&str>,
+    user_agent: Option<&str>,
+) -> Result<(), DbErr> {
+    let old_json = old_values.map(|c| serde_json::to_string(c).unwrap_or_default());
+    let new_json = new_values.map(|c| serde_json::to_string(c).unwrap_or_default());
+
+    log_audit(
+        db,
+        AuditEntry {
+            table_name: "contacts".to_string(),
+            record_id: contact_id,
+            action: "UPDATE".to_string(),
+            changed_by: changed_by.to_string(),
+            old_values: old_json,
+            new_values: new_json,
+            ip_address: ip_address.map(String::from),
+            user_agent: user_agent.map(String::from),
+        },
+    )
+    .await
+}
+
+/// Log a contact creation with full details as JSON
+pub async fn log_contact_update_with_details(
+    db: &DatabaseConnection,
+    contact_id: i32,
+    old_values_json: Option<String>,
+    new_values_json: Option<String>,
+    changed_by: &str,
+    ip_address: Option<&str>,
+    user_agent: Option<&str>,
+) -> Result<(), DbErr> {
+    log_audit(
+        db,
+        AuditEntry {
+            table_name: "contacts".to_string(),
+            record_id: contact_id,
+            action: "UPDATE".to_string(),
+            changed_by: changed_by.to_string(),
+            old_values: old_values_json,
+            new_values: new_values_json,
+            ip_address: ip_address.map(String::from),
+            user_agent: user_agent.map(String::from),
+        },
+    )
+    .await
+}

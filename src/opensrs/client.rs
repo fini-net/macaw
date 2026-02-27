@@ -1,9 +1,12 @@
 use super::auth::generate_signature;
 use super::error::Result;
-use super::types::{ClientConfig, GetDomainRequest, GetDomainsByExpireDateRequest};
+use super::types::{
+    ClientConfig, GetDomainRequest, GetDomainsByExpireDateRequest, SetContactRequest,
+    SetContactResponse,
+};
 use super::xml::{
-    deserialize_domain_all_info, deserialize_response, serialize_get_domain_request,
-    serialize_request,
+    deserialize_domain_all_info, deserialize_response, deserialize_set_contact_response,
+    serialize_get_domain_request, serialize_request, serialize_set_contact_request,
 };
 
 /// OpenSRS API client
@@ -75,6 +78,47 @@ impl OpenSrsClient {
         // Parse response
         let response_xml = response.body_mut().read_to_string()?;
         let parsed_response = deserialize_domain_all_info(&response_xml)?;
+
+        Ok(parsed_response)
+    }
+
+    /// Update domain contacts via OpenSRS API
+    ///
+    /// This sends a SET_CONTACT request to update the contact information
+    /// for a domain. The contact_set should contain the contacts to update.
+    pub fn update_domain_contacts(
+        &self,
+        domain: &str,
+        contact_set: super::types::SetContactSet,
+    ) -> Result<SetContactResponse> {
+        let request = SetContactRequest {
+            protocol: "XCP".to_string(),
+            object: "CONTACT".to_string(),
+            action: "SET".to_string(),
+            attributes: super::types::SetContactAttrs {
+                domain: domain.to_string(),
+                contact_set,
+            },
+        };
+
+        // Serialize to XML
+        let xml = serialize_set_contact_request(&request)?;
+
+        // Generate MD5 signature
+        let signature = generate_signature(&xml, &self.config.credential);
+
+        // Build and send HTTP request
+        let mut response = self
+            .agent
+            .post(self.config.environment.endpoint())
+            .header("Content-Type", "text/xml")
+            .header("X-Username", &self.config.username)
+            .header("X-Signature", &signature)
+            .send(xml.as_str())?;
+
+        // Parse response
+        let response_xml = response.body_mut().read_to_string()?;
+        let parsed_response = deserialize_set_contact_response(&response_xml)?;
 
         Ok(parsed_response)
     }

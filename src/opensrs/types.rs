@@ -190,3 +190,116 @@ pub struct TldDataMap {
     #[serde(default, flatten)]
     pub data: std::collections::HashMap<String, String>,
 }
+
+/// Field name mapping between OpenSRS and local DB schema
+/// OpenSRS uses different field names than our DB columns
+#[allow(dead_code)]
+pub mod contact_mapping {
+    pub const ORG_NAME: &str = "org_name";
+    pub const STATE: &str = "state";
+    pub const COUNTRY: &str = "country";
+
+    pub const DB_ORGANIZATION: &str = "organization";
+    pub const DB_STATE_PROVINCE: &str = "state_province";
+    pub const DB_COUNTRY_CODE: &str = "country_code";
+}
+
+/// Request to update domain contacts
+#[derive(Debug, Serialize)]
+pub struct SetContactRequest {
+    pub protocol: String,
+    pub object: String,
+    pub action: String,
+    pub attributes: SetContactAttrs,
+}
+
+/// Attributes for set_contact request
+#[derive(Debug, Serialize)]
+pub struct SetContactAttrs {
+    pub domain: String,
+    pub contact_set: SetContactSet,
+}
+
+/// Contact set for update requests - all four contact types
+#[derive(Debug, Serialize, Clone, Default)]
+pub struct SetContactSet {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub owner: Option<ContactInfoForUpdate>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub admin: Option<ContactInfoForUpdate>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub billing: Option<ContactInfoForUpdate>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub tech: Option<ContactInfoForUpdate>,
+}
+
+/// Contact information for update requests
+/// Uses OpenSRS field naming (org_name, state, country)
+#[derive(Debug, Serialize, Clone, Default)]
+pub struct ContactInfoForUpdate {
+    pub first_name: String,
+    pub last_name: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub org_name: Option<String>,
+    pub email: String,
+    pub phone: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub fax: Option<String>,
+    pub address1: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub address2: Option<String>,
+    pub city: String,
+    pub state: String,
+    pub postal_code: String,
+    pub country: String,
+}
+
+/// Convert from internal ContactInfo to ContactInfoForUpdate for OpenSRS
+impl From<&ContactInfo> for ContactInfoForUpdate {
+    fn from(contact: &ContactInfo) -> Self {
+        Self {
+            first_name: contact.first_name.clone(),
+            last_name: contact.last_name.clone(),
+            org_name: contact.org_name.clone(),
+            email: contact.email.clone(),
+            phone: contact.phone.clone(),
+            fax: contact.fax.clone(),
+            address1: contact.address1.clone(),
+            address2: contact.address2.clone(),
+            city: contact.city.clone(),
+            state: contact.state.clone(),
+            postal_code: contact.postal_code.clone(),
+            country: contact.country.clone(),
+        }
+    }
+}
+
+/// Convert from OpenSRS ContactInfo to internal ContactInfo
+/// Handles field name mapping from OpenSRS to DB schema
+impl From<&ContactInfo> for crate::db::contacts::ContactInfo {
+    fn from(contact: &ContactInfo) -> Self {
+        Self {
+            contact_type: String::new(),
+            first_name: contact.first_name.clone(),
+            last_name: contact.last_name.clone(),
+            organization: contact.org_name.clone(),
+            email: contact.email.clone(),
+            phone: contact.phone.clone(),
+            fax: contact.fax.clone(),
+            address1: contact.address1.clone(),
+            address2: contact.address2.clone(),
+            city: contact.city.clone(),
+            state_province: contact.state.clone(),
+            postal_code: contact.postal_code.clone(),
+            country_code: contact.country.clone(),
+        }
+    }
+}
+
+/// Response from set_contact
+#[derive(Debug, Deserialize)]
+pub struct SetContactResponse {
+    pub is_success: bool,
+    pub response_code: String,
+    pub response_text: String,
+}

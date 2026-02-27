@@ -25,8 +25,8 @@ erDiagram
         TEXT username "Unique - Authelia username"
         TEXT email
         TEXT company_name
-        DECIMAL account_balance
-        DECIMAL credit_limit
+        REAL account_balance
+        REAL credit_limit
         TEXT status "active, suspended, closed"
         DATETIME created_at
         DATETIME updated_at
@@ -99,8 +99,8 @@ erDiagram
         TEXT invoice_number "Unique"
         DATETIME invoice_date
         DATETIME due_date
-        DECIMAL total_amount
-        DECIMAL paid_amount
+        REAL total_amount
+        REAL paid_amount
         TEXT status "draft, issued, paid, overdue, cancelled"
         DATETIME created_at
         DATETIME updated_at
@@ -113,8 +113,8 @@ erDiagram
         TEXT item_type "registration, renewal, transfer, privacy, other"
         TEXT description
         INTEGER quantity
-        DECIMAL unit_price
-        DECIMAL total_price
+        REAL unit_price
+        REAL total_price
         DATETIME created_at
     }
 
@@ -124,7 +124,7 @@ erDiagram
         INTEGER invoice_id FK "Optional"
         TEXT payment_method "credit_card, bank_transfer, paypal, credit, other"
         TEXT transaction_id
-        DECIMAL amount
+        REAL amount
         DATETIME payment_date
         TEXT status "pending, completed, failed, refunded"
         TEXT notes

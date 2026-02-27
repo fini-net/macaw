@@ -18,6 +18,7 @@ struct Cli {
 }
 
 #[derive(Subcommand)]
+#[allow(clippy::large_enum_variant)]
 enum Commands {
     /// Sync domains from OpenSRS to database
     Sync {
@@ -296,18 +297,18 @@ async fn main() {
             // Build contact info for update
             let contact_info = db::contacts::ContactInfo {
                 contact_type: contact_type.clone(),
-                first_name,
-                last_name,
-                organization,
+                first_name: first_name.clone(),
+                last_name: last_name.clone(),
+                organization: organization.clone(),
                 email: email.clone(),
-                phone,
-                fax,
-                address1,
-                address2,
-                city,
-                state_province: state,
-                postal_code,
-                country_code: country,
+                phone: phone.clone(),
+                fax: fax.clone(),
+                address1: address1.clone(),
+                address2: address2.clone(),
+                city: city.clone(),
+                state_province: state.clone(),
+                postal_code: postal_code.clone(),
+                country_code: country.clone(),
             };
 
             // Find domain in database to get customer_id

@@ -11,15 +11,15 @@ Macaw is a domain registration backend that integrates with the OpenSRS API. It 
 Complete:
 
 - Database schema design (SQLite)
-- OpenSRS API integration (authentication and domain listing)
+- OpenSRS API integration (authentication, domain listing, contact updates)
 - Configuration management with environment variable loading
 - MD5-based signature authentication for OpenSRS
 - Custom XML serialization/deserialization for OpenSRS API
+- Database caching layer (sea-orm integration)
+- Multi-customer support (via `domains.toml` and `sync` command)
 
 Remaining:
 
-- Database caching layer (sea-orm integration)
-- Multi-customer support
 - Authelia authentication integration
 
 ## Database Architecture
@@ -87,20 +87,33 @@ sqlite3 macaw.db "PRAGMA foreign_keys;"
 
 ### Module Structure
 
-The codebase is organized into two main modules:
-
 - `src/config/` - Configuration management
   - `OpenSrsCredentials::from_env()` - Loads credentials from environment variables
   - `OpenSrsCredentials::available()` - Checks if credentials are present without loading
-  - Validates that credentials are non-empty
 
 - `src/opensrs/` - OpenSRS API client implementation
   - `auth.rs` - MD5 signature generation: `md5(md5(xml + key) + key)`
-  - `client.rs` - HTTP client with ureq, sends authenticated requests
-  - `domain.rs` - High-level domain operations (automatic pagination)
+  - `client.rs` - HTTP client with ureq (blocking), sends authenticated requests
+  - `domain.rs` - High-level domain operations (automatic pagination, contact updates)
   - `error.rs` - Error types using thiserror (ApiError, HttpError, XmlDeserialize, etc.)
   - `types.rs` - Request/response types (Environment, ClientConfig, ExpiringDomain)
   - `xml.rs` - Custom XML serialization for OpenSRS's non-standard `<dt_assoc>` format
+
+- `src/entities/` - sea-orm generated entity types for all database tables (customers, domains, contacts, nameservers, tld_data, invoices, billing_items, payments, audit_log, domain_contacts)
+
+- `src/db/` - Database operations layer wrapping sea-orm entities
+  - `mod.rs` - `db::connect()` opens SQLite with foreign keys enabled
+  - `customers.rs` - `create_or_get_customer()`
+  - `domains.rs` - `create_or_update_domain()`, `extract_tld()`, `map_opensrs_status()`
+  - `contacts.rs` - `find_or_create_contact()`, `link_contact_to_domain()`, `update_contact()` with `UpdateStrategy` (UpdateInPlace or CreateNew)
+  - `nameservers.rs` - `create_or_update_nameserver()`
+  - `tld_data.rs` - `create_or_update_tld_data()`
+  - `audit.rs` - Audit log helpers for creation and update events
+
+- `src/sync/` - Sync orchestration
+  - `config.rs` - Parses `domains.toml` (`DomainsConfig`) mapping customer slugs to domain lists
+  - `errors.rs` - `SyncError` type
+  - `mod.rs` - `run_sync()` orchestrates full sync; iterates customers, calls OpenSRS for each domain, writes to DB
 
 ### OpenSRS XML Format
 
@@ -118,6 +131,27 @@ The `OpenSrsClient` provides high-level methods that handle:
 3. HTTP headers (X-Username, X-Signature)
 4. Response parsing
 5. Automatic pagination (see `get_domains_by_expiredate`)
+6. Domain info retrieval (`get_domain_all_info`) including contacts, nameservers, TLD data
+7. Contact updates (`update_domain_contacts`)
+
+Note: `OpenSrsClient` uses blocking ureq for HTTP. The `sync` command calls it from an async context directly (no `spawn_blocking`); this is acceptable for CLI use but should be revisited for a server implementation.
+
+### CLI Commands
+
+The binary (`macaw`) uses clap with three subcommands:
+
+- `macaw sync [--customer <slug>] [--dry-run] [--config domains.toml] [--database macaw.db]` - Pull all domain data from OpenSRS into the local SQLite cache
+- `macaw list <year>` - List domains expiring in a given year (queries OpenSRS directly, not DB)
+- `macaw contacts <domain> --contact-type <owner|admin|tech|billing> [fields...] [--create-new]` - Update a contact in both OpenSRS and the local DB; `--create-new` creates a fresh contact record instead of updating the shared one
+
+### domains.toml
+
+Maps customer slugs to their domain lists. This file is gitignored (contains real customer data). A template with example entries is committed. Format:
+
+```toml
+[domain_groups]
+customer_slug = ["domain1.com", "domain2.org"]
+```
 
 ### Testing Strategy
 
@@ -126,37 +160,30 @@ Tests use `serial_test` crate for environment variable isolation. Integration te
 ## Technology Stack
 
 - **Language**: Rust 2024 edition
+- **Async runtime**: tokio 1 (full)
+- **CLI**: clap 4 (derive)
 - **HTTP Client**: ureq 3.0 (blocking, with native-tls)
 - **XML**: quick-xml 0.36 with manual serialization
 - **Hashing**: md-5 0.10 for OpenSRS signature
 - **Error Handling**: thiserror 2.0
 - **Date/Time**: chrono 0.4
-- **Database** (planned): sea-orm with SQLite
+- **Database**: sea-orm 1.1 with sqlx-sqlite and runtime-tokio-native-tls
 
-### sea-orm Integration (Future)
+### sea-orm Notes
 
-When implementing the Rust backend:
+Entities in `src/entities/` were generated from the schema via:
 
 ```bash
-# Install sea-orm CLI
-cargo install sea-orm-cli
-
-# Generate entities from existing schema
 sea-orm-cli generate entity \
     --database-url sqlite://macaw.db \
     --output-dir src/entities
-
-# Run migrations (when created)
-sea-orm-cli migrate up
 ```
 
-Key sea-orm considerations from `docs/database-schema.md`:
+Regenerate after schema changes. Key considerations:
 
-- Map SQLite BOOLEAN (INTEGER) to Rust `bool` types
-- Use `DeriveActiveEnum` for status/type enums with CHECK constraints
-- Implement audit logging in application layer for all INSERT/UPDATE/DELETE operations
-- Always use parameterized queries (sea-orm does this automatically)
-- Encrypt `domains.auth_code` at rest (transfer authorization codes are sensitive)
+- SQLite BOOLEAN (INTEGER) maps to Rust `bool`
+- Audit logging is handled in the application layer in `src/db/audit.rs`
+- Always filter queries by `customer_id` for row-level access control
 
 ## Credential Management
 
@@ -311,9 +338,16 @@ cargo audit        # Check for security vulnerabilities
 ### Running the Application
 
 ```bash
-just try              # Run with credentials (default)
+just try              # Run sync with credentials (default)
 just run_with_creds   # Run with OpenSRS credentials from 1Password
 just backtrace        # Run with RUST_BACKTRACE=1 for detailed errors
+```
+
+The default `just try` runs `macaw sync`. To run other subcommands with credentials:
+
+```bash
+fnox run -- cargo run -- list 2026
+fnox run -- cargo run -- contacts example.com --contact-type admin --first-name Jane ...
 ```
 
 ### Testing

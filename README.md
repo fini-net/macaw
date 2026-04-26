@@ -1,5 +1,6 @@
 # macaw
 
+[![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/fini-net/macaw/badge)](https://scorecard.dev/viewer/?uri=github.com/fini-net/macaw)
 ![GitHub Issues](https://img.shields.io/github/issues/fini-net/macaw)
 ![GitHub Pull Requests](https://img.shields.io/github/issues-pr/fini-net/macaw)
 ![GitHub License](https://img.shields.io/github/license/fini-net/macaw)

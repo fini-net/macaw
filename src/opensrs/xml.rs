@@ -1,6 +1,21 @@
 use super::error::{OpenSrsError, Result};
 use super::types::*;
 
+use quick_xml::escape::unescape as unescape_xml;
+
+/// Decode and unescape a `BytesText` event into an owned, trimmed `String`.
+///
+/// `quick-xml` 0.41 removed `BytesText::unescape()`; the replacement is the
+/// free function `quick_xml::escape::unescape`, which operates on a `&str`.
+/// OpenSRS responses are UTF-8, so we decode the raw bytes and then unescape.
+fn text_event_to_string(e: &quick_xml::events::BytesText<'_>) -> String {
+    let decoded = e.decode().unwrap_or_default();
+    unescape_xml(&decoded)
+        .unwrap_or_default()
+        .trim()
+        .to_string()
+}
+
 /// Serialize request to OpenSRS XML format
 ///
 /// OpenSRS uses a non-standard XML structure with <dt_assoc> and <item key="..."> tags.
@@ -123,7 +138,7 @@ pub fn deserialize_response(xml: &str) -> Result<GetDomainsByExpireDateResponse>
                     continue;
                 }
 
-                let text = e.unescape().unwrap_or_default().trim().to_string();
+                let text = text_event_to_string(&e);
                 if text.is_empty() {
                     continue;
                 }
@@ -728,7 +743,7 @@ pub fn deserialize_domain_all_info(xml: &str) -> Result<GetDomainAllInfoResponse
                     continue;
                 }
 
-                let text = e.unescape().unwrap_or_default().trim().to_string();
+                let text = text_event_to_string(&e);
                 if text.is_empty() {
                     continue;
                 }
@@ -865,7 +880,7 @@ pub fn deserialize_set_contact_response(xml: &str) -> Result<SetContactResponse>
                     continue;
                 }
 
-                let text = e.unescape().unwrap_or_default().trim().to_string();
+                let text = text_event_to_string(&e);
                 if text.is_empty() {
                     continue;
                 }

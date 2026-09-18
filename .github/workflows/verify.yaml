@@ -18,7 +18,7 @@ defaults:
 
 # in 2025 macos-latest is macos-15 and macos-13 is about to retire
 jobs:
-  test:
+  verify-matrix:
     strategy:
       matrix:
         os:

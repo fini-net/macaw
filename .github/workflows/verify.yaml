@@ -16,13 +16,13 @@ defaults:
   run:
     shell: bash
 
-# in 2025 macos-latest is macos-15 and macos-13 is about to retire
+# in 2026 macos-latest is macos-26 and macos-14 is about to retire (Nov 2, 2026)
 jobs:
   verify-matrix:
     strategy:
       matrix:
         os:
-          - macos-14
+          - macos-15
           - macos-latest
           - windows-latest
           - ubuntu-latest

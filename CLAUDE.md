@@ -327,12 +327,12 @@ Validation is enforced via CUE schema in `docs/repo-toml.cue` and verified with 
 ### Quality Checks
 
 ```bash
-just check         # Run all checks: fmt, clippy, test, audit
+just check         # Run all checks: fmt, clippy, test
 cargo fmt --check  # Check code formatting
 cargo check        # Compile check without building
 cargo clippy       # Run linter
 cargo test         # Run all tests
-cargo audit        # Check for security vulnerabilities
+just audit         # Check for security vulnerabilities (weekly in CI via audit.yml)
 ```
 
 ### Running the Application
@@ -408,6 +408,10 @@ Six workflows run on PRs and pushes to main:
 - `cue-verify` - Validates .repo.toml structure and flag configuration
 - `rust` - Rust build and test workflow
 - `verify` - Cross-platform testing with `just check`
+
+A weekly scheduled workflow also runs:
+
+- `cargo audit` - Checks `Cargo.lock` against the RustSec advisory DB (Tuesdays), files a tracking issue when advisories are found, and closes it once `cargo audit` passes again
 
 Run markdown linting locally: `markdownlint-cli2 **/*.md`
 

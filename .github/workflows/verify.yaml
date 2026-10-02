@@ -20,6 +20,7 @@ defaults:
 jobs:
   verify-matrix:
     strategy:
+      fail-fast: false
       matrix:
         os:
           - macos-15
@@ -49,9 +50,6 @@ jobs:
 
     - name: Check just version
       run: just --version
-
-    - name: Install cargo-audit
-      run: cargo install cargo-audit --locked
 
     - name: Test with just check
       run: just check

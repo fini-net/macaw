@@ -68,7 +68,8 @@ mv macaw ~/.local/bin/
 ### Commands
 
 - `just list` - Show all commands
-- `just check` - Run quality checks (fmt, clippy, test, audit)
+- `just check` - Run quality checks (fmt, clippy, test)
+- `just audit` - Check dependencies for security vulnerabilities
 - `just run_with_creds` - Run with OpenSRS credentials
 - `just test_with_creds` - Run tests with credentials
 

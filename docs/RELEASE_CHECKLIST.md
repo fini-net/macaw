@@ -7,7 +7,7 @@ This checklist ensures consistent, high-quality releases of Macaw using cargo-di
 ### Code Quality
 
 - [ ] All tests pass: `just check`
-- [ ] No security vulnerabilities: `cargo audit`
+- [ ] No security vulnerabilities: `just audit`
 - [ ] Code is formatted: `cargo fmt --check`
 - [ ] Linter is happy: `cargo clippy`
 - [ ] Documentation is up to date

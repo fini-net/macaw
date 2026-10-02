@@ -31,6 +31,10 @@ check:
   cargo check
   cargo clippy
   cargo test --workspace
+
+# check dependencies for security vulnerabilities
+[group('Rust')]
+audit:
   cargo audit
 
 # add a crate dependancy
